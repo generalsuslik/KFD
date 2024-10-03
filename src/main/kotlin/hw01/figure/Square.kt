@@ -1,6 +1,6 @@
-package hw01
+package hw01.figure
 
-class Square(private val side: Double) : Figure("Square", side) {
+internal class Square(private val side: Double) : Figure("Square", side) {
     init {
         println("Square(property=${this.side})")
     }

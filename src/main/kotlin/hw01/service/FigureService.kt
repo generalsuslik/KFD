@@ -1,4 +1,4 @@
-package hw01
+package hw01.service
 
 interface FigureService {
     fun addCircle(property: Double)

@@ -1,4 +1,8 @@
-package hw01
+package hw01.service
+
+import hw01.figure.Circle
+import hw01.figure.Figure
+import hw01.figure.Square
 
 class FigureServiceImpl : FigureService {
     private val figList: MutableList<Figure> = mutableListOf()
@@ -15,7 +19,7 @@ class FigureServiceImpl : FigureService {
     override fun getArea(): Double {
         var area: Double = 0.0
         figList.forEach {
-            area = it.getArea()
+            area += it.getArea()
         }
 
         return area

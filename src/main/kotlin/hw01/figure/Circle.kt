@@ -1,9 +1,9 @@
-package hw01
+package hw01.figure
 
 import kotlin.math.PI
 
 
-class Circle(private val radius: Double) : Figure("Circle", radius) {
+internal class Circle(private val radius: Double) : Figure("Circle", radius) {
     init {
         println("Circle(property=${this.radius})")
     }

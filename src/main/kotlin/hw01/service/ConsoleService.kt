@@ -1,4 +1,4 @@
-package hw01
+package hw01.service
 
 interface ConsoleService {
     fun work()

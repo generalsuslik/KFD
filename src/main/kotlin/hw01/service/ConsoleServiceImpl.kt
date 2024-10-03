@@ -1,4 +1,7 @@
-package hw01
+package hw01.service
+
+import hw01.exception.BadPropertyException
+import hw01.exception.WrongOperationTypeException
 
 class ConsoleServiceImpl : ConsoleService {
 
