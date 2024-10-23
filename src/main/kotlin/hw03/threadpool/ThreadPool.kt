@@ -38,16 +38,19 @@ class ThreadPool(threadCount: Int) : Executor {
     }
 
     override fun execute(command: Runnable) {
-        lock.lock()
-        try {
+        while (!lock.tryLock()) {
             if (!running) {
                 throw UnableToExecuteException("Thread pool is not running")
             }
-            queue.add(command)
-            condition.signal()
-        } finally {
-            lock.unlock()
         }
+
+        if (!running) {
+            throw UnableToExecuteException("Thread pool is not running")
+        }
+
+        queue.add(command)
+        condition.signal()
+        lock.unlock()
     }
 
     fun shutdown(wait: Boolean) {
@@ -61,8 +64,6 @@ class ThreadPool(threadCount: Int) : Executor {
 
         if (wait) {
             threads.forEach { it.join() }
-        } else {
-            threads.forEach { it.interrupt() }
         }
         queue.clear()
     }
