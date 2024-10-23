@@ -16,18 +16,20 @@ class ThreadPool(threadCount: Int) : Executor {
     init {
         repeat(threadCount) {
             val thread = Thread {
-                lock.lock()
-                try {
-                    while (queue.isEmpty()) {
-                        if (!running) {
-                            return@Thread
+                while (true) {
+                    lock.lock()
+                    try {
+                        while (queue.isEmpty()) {
+                            if (!running) {
+                                return@Thread
+                            }
+                            condition.await()
                         }
-                        condition.await()
+                        val task = queue.removeFirst()
+                        task.run()
+                    } finally {
+                        lock.unlock()
                     }
-                    val task = queue.removeFirst()
-                    task.run()
-                } finally {
-                    lock.unlock()
                 }
             }
             threads.add(thread)
