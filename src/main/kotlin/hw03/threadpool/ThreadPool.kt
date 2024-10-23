@@ -17,19 +17,24 @@ class ThreadPool(threadCount: Int) : Executor {
         repeat(threadCount) {
             val thread = Thread {
                 while (true) {
+                    val task: Runnable
                     lock.lock()
                     try {
-                        while (queue.isEmpty()) {
-                            if (!running) {
-                                return@Thread
-                            }
+                        while (queue.isEmpty() && running) {
                             condition.await()
                         }
-                        val task = queue.removeFirst()
-                        task.run()
+
+                        if (queue.isEmpty() && !running) {
+                            return@Thread
+                        }
+
+                        task = queue.removeFirst()
                     } finally {
                         lock.unlock()
                     }
+                    try {
+                        task.run()
+                    } catch (_: InterruptedException) {}
                 }
             }
             threads.add(thread)
@@ -38,19 +43,16 @@ class ThreadPool(threadCount: Int) : Executor {
     }
 
     override fun execute(command: Runnable) {
-        while (!lock.tryLock()) {
+        lock.lock()
+        try {
             if (!running) {
                 throw UnableToExecuteException("Thread pool is not running")
             }
+            queue.add(command)
+            condition.signal()
+        } finally {
+            lock.unlock()
         }
-
-        if (!running) {
-            throw UnableToExecuteException("Thread pool is not running")
-        }
-
-        queue.add(command)
-        condition.signal()
-        lock.unlock()
     }
 
     fun shutdown(wait: Boolean) {
@@ -58,6 +60,9 @@ class ThreadPool(threadCount: Int) : Executor {
         try {
             running = false
             condition.signalAll()
+            if (!wait) {
+                queue.clear()
+            }
         } finally {
             lock.unlock()
         }
@@ -65,7 +70,6 @@ class ThreadPool(threadCount: Int) : Executor {
         if (wait) {
             threads.forEach { it.join() }
         }
-        queue.clear()
     }
 }
 
