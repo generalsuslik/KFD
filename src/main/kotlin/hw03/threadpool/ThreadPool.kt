@@ -62,13 +62,14 @@ class ThreadPool(threadCount: Int) : Executor {
             condition.signalAll()
             if (!wait) {
                 queue.clear()
+                threads.forEach(Thread::interrupt)
             }
         } finally {
             lock.unlock()
         }
 
         if (wait) {
-            threads.forEach { it.join() }
+            threads.forEach(Thread::join)
         }
     }
 }

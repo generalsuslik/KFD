@@ -15,5 +15,5 @@ fun main() {
     threadPool.execute(task3)
     threadPool.execute(task4)
 
-    threadPool.shutdown(false)
+    threadPool.shutdown(true)
 }
