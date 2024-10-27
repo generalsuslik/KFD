@@ -1,6 +1,5 @@
 package hw03.threadpool
 
-import hw03.exception.UnableToExecuteException
 import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.locks.ReentrantLock
@@ -46,7 +45,7 @@ class ThreadPool(threadCount: Int) : Executor {
         lock.lock()
         try {
             if (!running) {
-                throw UnableToExecuteException("Thread pool is not running")
+                throw RuntimeException("Thread pool is not running")
             }
             queue.add(command)
             condition.signal()
